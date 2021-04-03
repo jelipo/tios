@@ -1,5 +1,5 @@
 pub fn sbi_call(which: usize, arg0: usize, arg1: usize, arg2: usize) -> usize {
-    let mut ret;
+    let mut ret = 0;
     unsafe {
         llvm_asm!("ecall"
             : "={x10}" (ret)
