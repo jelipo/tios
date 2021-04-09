@@ -1,17 +1,20 @@
 use core::fmt;
 use core::fmt::Write;
 
-const SYSCALL_WRITE: usize = 64;
+const SBI_CONSOLE_PUTCHAR: usize = 1;
 
-pub fn sys_write(fd: usize, buffer: &[u8]) -> isize {
-    syscall(SYSCALL_WRITE, [fd, buffer.as_ptr() as usize, buffer.len()])
+pub fn console_putchar(c: usize) {
+    syscall(SBI_CONSOLE_PUTCHAR, [c, 0, 0]);
 }
 
 struct Stdout;
 
 impl Write for Stdout {
     fn write_str(&mut self, s: &str) -> fmt::Result {
-        sys_write(1, s.as_bytes());
+        //sys_write(STDOUT, s.as_bytes());
+        for c in s.chars() {
+            console_putchar(c as usize);
+        }
         Ok(())
     }
 }
@@ -33,12 +36,6 @@ macro_rules! println {
         $crate::console::print(format_args!(concat!($fmt, "\n") $(, $($arg)+)?));
     }
 }
-
-pub fn sys_exit(xstate: i32) -> isize {
-    syscall(SYSCALL_EXIT, [xstate as usize, 0, 0])
-}
-
-const SYSCALL_EXIT: usize = 93;
 
 fn syscall(id: usize, args: [usize; 3]) -> isize {
     let mut ret: isize;
