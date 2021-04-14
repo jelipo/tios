@@ -5,7 +5,7 @@ use crate::sbi::sbi_call;
 const SBI_CONSOLE_PUTCHAR: usize = 1;
 
 pub fn console_putchar(c: usize) {
-    sbi_call(SBI_CONSOLE_PUTCHAR, c, 0, 0);
+    syscall(SBI_CONSOLE_PUTCHAR, [c, 0, 0]);
 }
 
 struct Stdout;
@@ -36,4 +36,18 @@ macro_rules! println {
     ($fmt: literal $(, $($arg: tt)+)?) => {
         $crate::console::print(format_args!(concat!($fmt, "\n") $(, $($arg)+)?));
     }
+}
+
+
+fn syscall(id: usize, args: [usize; 3]) -> isize {
+    let mut ret: isize;
+    unsafe {
+        llvm_asm!("ecall"
+            : "={x10}" (ret)
+            : "{x10}" (args[0]), "{x11}" (args[1]), "{x12}" (args[2]), "{x17}" (id)
+            : "memory"
+            : "volatile"
+        );
+    }
+    ret
 }
