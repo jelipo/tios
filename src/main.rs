@@ -15,7 +15,10 @@ global_asm!(include_str!("entry.asm"));
 
 #[no_mangle]
 pub fn rust_main() -> ! {
-    println!("\x1b[31mhello world\x1b[0m {}", "2021-04-15");
+    clear_bss();
+    sys_info!("Hello World!!!");
+    sys_warn!("Hello World!!!");
+    sys_error!("Hello World!?");
     shutdown()
 }
 

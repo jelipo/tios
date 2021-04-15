@@ -1,5 +1,6 @@
 use core::fmt;
 use core::fmt::Write;
+
 use crate::sbi::sbi_call;
 
 const SBI_CONSOLE_PUTCHAR: usize = 1;
@@ -35,6 +36,33 @@ macro_rules! print {
 macro_rules! println {
     ($fmt: literal $(, $($arg: tt)+)?) => {
         $crate::console::print(format_args!(concat!($fmt, "\n") $(, $($arg)+)?));
+    }
+}
+
+#[macro_export]
+macro_rules! sys_info {
+    ($fmt: literal $(, $($arg: tt)+)?) => {
+        $crate::console::print(
+            format_args!(concat!("\x1b[94m[INFO] ", $fmt, "\x1b[0m\n") $(, $($arg)+)?)
+        );
+    }
+}
+
+#[macro_export]
+macro_rules! sys_error {
+    ($fmt: literal $(, $($arg: tt)+)?) => {
+        $crate::console::print(
+            format_args!(concat!("\x1b[91m[ERROR] ", $fmt, "\x1b[0m\n") $(, $($arg)+)?)
+        );
+    }
+}
+
+#[macro_export]
+macro_rules! sys_warn {
+    ($fmt: literal $(, $($arg: tt)+)?) => {
+        $crate::console::print(
+            format_args!(concat!("\x1b[93m[WARN] ", $fmt, "\x1b[0m\n") $(, $($arg)+)?)
+        );
     }
 }
 
