@@ -6,7 +6,7 @@
 
 use core::panic::PanicInfo;
 
-use crate::sbi::sbi_call;
+use crate::sbi::{sbi_call, sbi_ext_call, SbiError};
 
 mod console;
 mod sbi;
@@ -19,8 +19,13 @@ pub fn rust_main() -> ! {
     sys_info!("Hello World!!!");
     sys_warn!("Hello World!!!");
     sys_error!("Hello World!?");
+
+    //let i = get_spec_version();
+    //println!("{:?}", i);
+
     shutdown()
 }
+
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
@@ -33,6 +38,7 @@ fn clear_bss() {
         fn sbss();
         fn ebss();
     }
+    println!("{:x}", sbss as usize);
     (sbss as usize..ebss as usize).for_each(|a| {
         unsafe { (a as *mut u8).write_volatile(0) }
     });
