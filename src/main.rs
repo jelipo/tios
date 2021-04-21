@@ -10,6 +10,8 @@ use crate::sbi::{sbi_call, sbi_ext_call, SbiError};
 
 mod console;
 mod sbi;
+mod batch;
+mod trap;
 
 global_asm!(include_str!("entry.asm"));
 
