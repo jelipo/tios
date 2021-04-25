@@ -12,6 +12,7 @@ mod console;
 mod sbi;
 mod batch;
 mod trap;
+mod fs;
 
 global_asm!(include_str!("entry.asm"));
 
