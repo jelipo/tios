@@ -11,8 +11,7 @@ use crate::sbi::{sbi_call, sbi_ext_call, SbiError};
 mod console;
 mod sbi;
 mod batch;
-mod trap;
-mod fs;
+
 
 global_asm!(include_str!("entry.asm"));
 
@@ -52,4 +51,24 @@ const SBI_SHUTDOWN: usize = 8;
 pub fn shutdown() -> ! {
     sbi_call(SBI_SHUTDOWN, 0, 0, 0);
     unreachable!()
+}
+
+lazy_static! {
+    static ref APP_MANAGER: AppManager = AppManager {
+        inner: RefCell::new({
+            extern "C" { fn _num_app(); }
+            let num_app_ptr = _num_app as usize as *const usize;
+            let num_app = unsafe { num_app_ptr.read_volatile() };
+            let mut app_start: [usize; MAX_APP_NUM + 1] = [0; MAX_APP_NUM + 1];
+            let app_start_raw: &[usize] = unsafe {
+                core::slice::from_raw_parts(num_app_ptr.add(1), num_app + 1)
+            };
+            app_start[..=num_app].copy_from_slice(app_start_raw);
+            AppManagerInner {
+                num_app,
+                current_app: 0,
+                app_start,
+            }
+        }),
+    };
 }

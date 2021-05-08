@@ -1,22 +1,13 @@
-const USER_STACK_SIZE: usize = 4096 * 2;
-const KERNEL_STACK_SIZE: usize = 4096 * 2;
+use core::cell::RefCell;
 
-#[repr(align(4096))]
-struct KernelStack {
-    data: [u8; KERNEL_STACK_SIZE],
+struct AppManager {
+    inner: RefCell<AppManagerInner>,
 }
 
-#[repr(align(4096))]
-struct UserStack {
-    data: [u8; USER_STACK_SIZE],
+struct AppManagerInner {
+    num_app: usize,
+    current_app: usize,
+    app_start: [usize; MAX_APP_NUM + 1],
 }
 
-static KERNEL_STACK: KernelStack = KernelStack { data: [0; KERNEL_STACK_SIZE] };
-static USER_STACK: UserStack = UserStack { data: [0; USER_STACK_SIZE] };
-
-
-impl UserStack {
-    fn get_sp(&self) -> usize {
-        self.data.as_ptr() as usize + USER_STACK_SIZE
-    }
-}
+unsafe impl Sync for AppManager {}
